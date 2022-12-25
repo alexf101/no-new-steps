@@ -6,32 +6,94 @@
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+      .page {
+        background: grey;
+        /* Printable margins: 3.2 sides, 1.5 top, 14.5 bottom*/
+        width: calc(210mm - 3.2mm * 2);
+        height: calc(297mm - 1.5mm - 14.5mm);
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        grid-template-rows: repeat(3, 1fr);
+      }
+      .card {
+        background: blue;
+        border: 1px solid black;
+        display: grid;
+        grid-template-areas:
+          "top-left topright"
+          "title title"
+          "text text"
+          "bottomleft bottomright";
+        grid-template-rows: 30px 50px 1fr 30px;
+        grid-template-columns: 1fr 1fr;
+      }
+      .card .title {
+        margin: 4px auto;
+        grid-area: title;
+      }
+      .card .direction {
+        margin: 4px;
+        grid-area: top-left;
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>
     <script type="text/babel">
     
-      function MyApp() {
-        return <h1>Hello, world!</h1>;
+      function Page(props) {
+        return <div className="page">
+          {props.children}
+        </div>;
       }
 
+      function Card(props) {
+        const card = props.card || {title: "", direction: Direction.Forward};
+        console.log('card: ', card);  // XX
+        return <div className="card">
+          <div className="title">{card.title}</div>
+          <div className="direction">
+            {card.direction === Direction.Forward ? "forward" : "backward"}</div>
+        </div>;
+      }
+    
+      function Deck(props) {
+        return <Page>
+          <Card />
+          <Card />
+          <Card />
+          <Card />
+          <Card />
+          <Card />
+          <Card />
+            {props.cards.map(card => <Card card={card}></Card>)}
+        </Page>;
+      }
+      const Direction = {Forward: new Object(), Back: new Object()}
+      const Foot = {Left: new Object()}
+      const Left = {None: new Object()}
+      const Rotation = {None: new Object()}
+      const cards = [
+        {
+          title: "closed change left",
+          direction: Direction.Forward,
+          foot: Foot.Left,
+          rotation: Rotation.None,
+          finishFoot: Foot.Right,
+        },
+        {
+          title: "closed change right",
+          direction: Direction.Right,
+          foot: Foot.Right,
+          rotation: Rotation.None,
+          finishFoot: Foot.Left,
+        }
+      ]
       const container = document.getElementById('root');
       const root = ReactDOM.createRoot(container);
-      root.render(<MyApp />);
+      root.render(<Deck cards={cards}/>);
 
     </script>
-    <!--
-      Note: this page is a great way to try React but it's not suitable for production.
-      It slowly compiles JSX with Babel in the browser and uses a large development build of React.
-
-      Read this section for a production-ready setup with JSX:
-      https://reactjs.org/docs/add-react-to-a-website.html#add-jsx-to-a-project
-
-      In a larger project, you can use an integrated toolchain that includes JSX instead:
-      https://reactjs.org/docs/create-a-new-react-app.html
-
-      You can also use React without JSX, in which case you can remove Babel:
-      https://reactjs.org/docs/react-without-jsx.html
-    -->
   </body>
 </html>
